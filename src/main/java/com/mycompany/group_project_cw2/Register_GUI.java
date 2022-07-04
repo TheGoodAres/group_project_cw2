@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class Register_GUI extends JFrame implements ActionListener {
         //container
@@ -25,10 +27,13 @@ public class Register_GUI extends JFrame implements ActionListener {
         //Buttons
         JButton registerButton = new JButton("Register");
         JButton loginButton = new JButton("LOGIN HERE");
-        Register_GUI() {
+    private Component frame;
+
+    Register_GUI() {
             setLayout();
             setComponentsLocation();
             addComponents();
+            addActionEvent();
         }
         public void setLayout()
         {
@@ -72,7 +77,49 @@ public class Register_GUI extends JFrame implements ActionListener {
         }
         @Override
         public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == registerButton) {
+                boolean register = false;
+                final Pattern PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+                String firstName;
+                String lastName;
+                String email;
+                char[] password;
+                char[] confirmPassword;
+                firstName = firstNameField.getText();
+                lastName = lastNameField.getText();
+                email = emailTextField.getText();
+                password = passwordField.getPassword();
+                confirmPassword = confirmPasswordField.getPassword();
+                if (!Arrays.equals(passwordField.getPassword(), confirmPasswordField.getPassword())) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Make sure passwords match!",
+                            "Password Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                else if (!PATTERN.matcher(email).matches()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Make sure you enter a proper email!",
+                            "Email error!",
+                            JOptionPane.ERROR_MESSAGE);
+                } else{
+                    register = true;
+                }
+                if(register) {
 
+                }
+            } else {
+                setVisible(false);
+                Login_GUI GUI = new Login_GUI();
+                GUI.setTitle("LOGIN");
+                GUI.setVisible(true);
+                GUI.setSize(400,600);
+                GUI.setResizable(false);
+                GUI.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            }
+        }
+        public void addActionEvent(){
+            loginButton.addActionListener(this);
+            registerButton.addActionListener(this);
         }
     }
 
