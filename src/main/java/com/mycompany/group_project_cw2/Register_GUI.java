@@ -1,11 +1,18 @@
 package com.mycompany.group_project_cw2;
 
+import org.sqlite.SQLiteException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.NoSuchAlgorithmException;
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Register_GUI extends JFrame implements ActionListener {
         //container
@@ -79,7 +86,7 @@ public class Register_GUI extends JFrame implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == registerButton) {
                 boolean register = false;
-                final Pattern PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+                final Pattern PATTERN = Pattern.compile("^[A-Z\\d._%+-]+@[A-Z\\d.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
                 String firstName;
                 String lastName;
                 String email;
@@ -102,10 +109,38 @@ public class Register_GUI extends JFrame implements ActionListener {
                             "Email error!",
                             JOptionPane.ERROR_MESSAGE);
                 } else{
+                    Connection con = connectDB.getConnection();
+
                     register = true;
                 }
                 if(register) {
-
+                    Connection con = connectDB.getConnection();
+                    byte[] byteSalt = null;
+                    try {
+                        byteSalt = HashPassword.getSalt();
+                    } catch (NoSuchAlgorithmException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    byte[] digestHashPassword = HashPassword.getSaltedHashSHA512(String.valueOf(password), byteSalt);
+                    String stringDigestedPassword = HashPassword.toHex(digestHashPassword);
+                    String strSalt = HashPassword.toHex(byteSalt);
+                    System.out.println(stringDigestedPassword);
+                    System.out.println(strSalt);
+                    try {
+                        PreparedStatement pStatement = con.prepareStatement(
+                                "INSERT INTO USER (firstName, lastName, email, password, salt)  VALUES(?, ?, ?, ?, ?)");
+                        pStatement.setString(1, firstName);
+                        pStatement.setString(2, lastName);
+                        pStatement.setString(3, email);
+                        pStatement.setString(4, stringDigestedPassword);
+                        pStatement.setString(5, strSalt);
+                        pStatement.executeUpdate();
+                    } catch (SQLException ex) {
+                        if(ex.getMessage().contains("USER.email")) {
+                            JOptionPane.showMessageDialog(null, "Email already exists");
+                        }
+                        else throw new RuntimeException(ex);
+                    }
                 }
             } else {
                 setVisible(false);

@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
 
 public class Login_GUI extends JFrame implements ActionListener {
     //container
@@ -62,7 +67,38 @@ public class Login_GUI extends JFrame implements ActionListener {
             char[] password;
             email = emailTextField.getText();
             password = passwordField.getPassword();
-            System.out.println(password);
+            try{
+                Connection con = connectDB.getConnection();
+                System.out.println("connection");
+                String sql = "SELECT firstName, lastName, email, password, salt   FROM USER";
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql);
+                System.out.println("AfterresultSet");
+                while(resultSet.next()) {
+                    String storedEmail = resultSet.getString("email");
+                    String storeFirstName = resultSet.getString("firstName");
+                    String storedLastName = resultSet.getString("lastName");
+                    String storedPassword = resultSet.getString("password");
+                    String storedSalt = resultSet.getString("salt");
+                    if(storedEmail.equals(email)) {
+                        System.out.println("email equals");
+                        byte[] storedSaltToByte = HashPassword.fromHex(storedSalt);
+                        byte[] storedPasswordToByte = HashPassword.fromHex(storedPassword);
+                        byte[] inputPassword = HashPassword.getSaltedHashSHA512(String.valueOf(password), storedSaltToByte);
+
+                        if(Arrays.equals(inputPassword, storedPasswordToByte)) {
+                            JOptionPane.showMessageDialog(null, "Passwords Match");
+                        }
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, " ERror");
+                    }
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+
+
         } else {
             Register_GUI GUI = new Register_GUI();
             GUI.setTitle("REGISTER");
