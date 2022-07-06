@@ -92,22 +92,33 @@ public class Register_GUI extends JFrame implements ActionListener {
                 String email;
                 char[] password;
                 char[] confirmPassword;
-                firstName = firstNameField.getText();
-                lastName = lastNameField.getText();
-                email = emailTextField.getText();
+                firstName = firstNameField.getText().strip();
+                lastName = lastNameField.getText().strip();
+                email = emailTextField.getText().strip();
+                System.out.println(firstName.length());
                 password = passwordField.getPassword();
                 confirmPassword = confirmPasswordField.getPassword();
-                if (!Arrays.equals(passwordField.getPassword(), confirmPasswordField.getPassword())) {
+                if (firstName.length() == 0) {
                     JOptionPane.showMessageDialog(frame,
-                            "Make sure passwords match!",
-                            "Password Error",
+                            "Please enter your first name!",
+                            "First name empty!",
                             JOptionPane.ERROR_MESSAGE);
-                }
-                else if (!PATTERN.matcher(email).matches()) {
+                }else if (!PATTERN.matcher(email).matches()) {
                     JOptionPane.showMessageDialog(frame,
                             "Make sure you enter a proper email!",
                             "Email error!",
                             JOptionPane.ERROR_MESSAGE);
+                } else if (!Arrays.equals(passwordField.getPassword(), confirmPasswordField.getPassword())) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Make sure passwords match!",
+                            "Password Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }else if (lastName.length() == 0) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Please enter your last name!",
+                            "Last name empty!",
+                            JOptionPane.ERROR_MESSAGE);
+                    System.out.println("LAST NAME EMPTY");
                 } else{
                     Connection con = connectDB.getConnection();
 
