@@ -73,7 +73,6 @@ public class Login_GUI extends JFrame implements ActionListener {
                 String sql = "SELECT firstName, lastName, email, password, salt   FROM USER";
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql);
-                System.out.println("AfterresultSet");
                 while(resultSet.next()) {
                     String storedEmail = resultSet.getString("email");
                     String storeFirstName = resultSet.getString("firstName");

@@ -83,7 +83,7 @@ public class Register_GUI extends JFrame implements ActionListener {
             container.add(lastNameField);
         }
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)  {
             if(e.getSource() == registerButton) {
                 boolean register = false;
                 final Pattern PATTERN = Pattern.compile("^[A-Z\\d._%+-]+@[A-Z\\d.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
